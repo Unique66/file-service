@@ -1,0 +1,23 @@
+#spring:
+#  mvc:
+#    #添加静态资源扫描前缀，默认为/** 与动态资源扫描可能冲突，添加前缀方便开发
+#    #示例链接：http://localhost:8080/res/bbb.jpg
+#    # 源码WebMvcAutoConfiguration 中 WebMvcAutoConfigurationAdapter的 addResourceHandlers 定义
+#    static-path-pattern: /res/**   #会导致 welcome page 功能失效
+#  web:
+#    resources:
+#      #自定义静态资源文件夹，不使用默认的
+#      # 源码WebMvcAutoConfiguration 中 WebMvcAutoConfigurationAdapter的 addResourceHandlers 调用 Resources的配置
+#      # this.resourceProperties.getStaticLocations() 获取
+#      static-locations: [classpath:/customstaticpaths/]
+
+#  mvc:
+#    hiddenmethod:
+#      filter:
+#        # 源码WebMvcAutoConfiguration 中的hiddenHttpMethodFilter
+#        enabled: true #开启表单提交RESTFul 风格的请求filter，将请求包装为指定的RESTFul 风格请求
+
+server:
+  servlet:
+    context-path: /file-service #服务访问的前置路径   localhost:8090/file-service
+  port: 8090
