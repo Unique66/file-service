@@ -21,3 +21,8 @@ server:
   servlet:
     context-path: /file-service #服务访问的前置路径   localhost:8090/file-service
   port: 8090
+spring:
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
