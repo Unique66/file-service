@@ -1,13 +1,15 @@
 package com.file.service.controller;
 
 import com.file.service.model.vo.BreakPointVO;
-import org.springframework.util.DigestUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.Arrays;
 
@@ -46,26 +48,32 @@ public class FileController {
     }
 
     // 分片上传
-    @PostMapping("/chunkUploadFile")
-    public String chunkUploadFile(MultipartFile file, String fileName) throws IOException {
-        String path = "F:/test/testUpload/";
-        InputStream is = file.getInputStream();
-        byte[] bytes = new byte[1024];
-        RandomAccessFile os = new RandomAccessFile(path + fileName,"rw");
-        while (is.read(bytes) != -1) {
-            os.write(bytes);
+    @GetMapping("/download")
+    public void chunkUploadFile(@RequestParam("fileName") String fileName,
+        HttpServletRequest request, HttpServletResponse response) {
+//        String path = "F:/test/testDownload/";
+        String path = "E:\\迅雷下载\\哈林波特\\";
+        File downloadFile = new File(path + fileName);
+        response.setHeader(HttpHeaders.CONTENT_LENGTH, downloadFile.length() + "");
+        response.setHeader(HttpHeaders.ACCEPT_RANGES, "bytes");
+        response.setHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, "Content-Disposition");
+        response.setHeader(HttpHeaders.CONTENT_TYPE, "multipart/form-data");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename="
+                + new String(fileName.getBytes()));
+        response.setContentType("application/octet-stream");
+
+        byte[] bytes = new byte[1024 * 1024];
+        try (RandomAccessFile is = new RandomAccessFile(downloadFile,"rw");
+            OutputStream os = response.getOutputStream()) {
+            int len;
+            while ((len = is.read(bytes)) != -1) {
+                os.write(bytes, 0, len);
+                os.flush();
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+//            e.printStackTrace();
         }
-        String fileMD5 = DigestUtils.md5DigestAsHex(file.getInputStream());
-        System.out.println(fileMD5);
-        System.out.println(DigestUtils.md5DigestAsHex(
-                new FileInputStream(new File(path + fileName))));
-        System.out.println(DigestUtils.md5DigestAsHex(
-                new FileInputStream(new File(path + fileName))));
-        System.out.println(fileMD5.equals(DigestUtils.md5DigestAsHex(
-                new FileInputStream(new File(path + fileName)))));
-        os.close();
-        is.close();
-        return fileName;
     }
 
     static String BREAK_POINT_PATH = PATH + "breakPoint/";

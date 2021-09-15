@@ -21,8 +21,18 @@ server:
   servlet:
     context-path: /file-service #服务访问的前置路径   localhost:8090/file-service
   port: 8090
+  tomcat:
+    max-connections: 20000
+    accept-count: 1000
+    threads:
+      min-spare: 9
+      max: 1000
 spring:
   servlet:
     multipart:
       max-file-size: 200MB
       max-request-size: 200MB
+#  task:
+#    execution:
+#      pool:
+#        keep-alive: 80
